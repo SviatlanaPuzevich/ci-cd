@@ -1,0 +1,60 @@
+name: CI Validation
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+  pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize, reopened ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-branch-name:
+    name: Check Branch Prefix
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Verify feature/ prefix
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          echo "Checking branch name: $BRANCH_NAME"
+          if [[ "$BRANCH_NAME" =~ ^feature/ ]]; then
+            echo "✅ Validation passed! Branch name starts with 'feature/'."
+            exit 0
+          else
+            echo "❌ Validation failed! Development is only allowed in branches starting with 'feature/'."
+            echo "Please rename your branch and submit a new PR."
+            exit 1
+          fi
+
+  verify-code:
+    name: Lint, Test and Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Linters
+        run: npm run lint
+
+      - name: Run Tests
+        run: npm test
+
+      - name: Build Application
+        run: npm run build
