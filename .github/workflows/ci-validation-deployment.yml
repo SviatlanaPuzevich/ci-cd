@@ -10,8 +10,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -70,7 +68,6 @@ jobs:
   deploy:
     name: Deploy to GitHub Pages
     needs: verify-code
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     permissions:
