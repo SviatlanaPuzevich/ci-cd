@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const EslintPlugin = require('eslint-webpack-plugin');
@@ -10,6 +11,8 @@ module.exports = (env, argv) => {
   const devMode = mode === 'development';
   const target = devMode ? 'web' : 'browserslist';
   const devtool = devMode ? 'source-map' : undefined;
+  const basePath = devMode ? '' : '/ci-cd';
+
   return {
     mode,
     target,
@@ -17,7 +20,7 @@ module.exports = (env, argv) => {
     entry: './src/index.ts',
     output: {
       path: path.resolve(__dirname, 'dist'),
-      publicPath: devMode ? '/' : '/ci-cd/',
+      publicPath: `${basePath}/`,
       clean: true,
       filename: '[name].[contenthash].js',
       assetModuleFilename: 'assets/[name][ext]',
@@ -33,11 +36,26 @@ module.exports = (env, argv) => {
         template: 'src/index.html',
       }),
 
+      // Duplicate of index.html: GitHub Pages serves this for any unmatched path
+      // under /ci-cd/, letting the client-side router handle deep links/refreshes.
+      ...(devMode
+        ? []
+        : [
+            new HtmlWebpackPlugin({
+              template: 'src/index.html',
+              filename: '404.html',
+            }),
+          ]),
+
       new MiniCssExtractPlugin({
         filename: '[name].[contenthash].css',
       }),
 
       new EslintPlugin({ extensions: ['ts', 'js'] }),
+
+      new webpack.DefinePlugin({
+        'process.env.PUBLIC_URL': JSON.stringify(basePath),
+      }),
 
       new CopyPlugin({
         patterns: [
