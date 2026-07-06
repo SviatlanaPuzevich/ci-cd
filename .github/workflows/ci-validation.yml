@@ -1,0 +1,68 @@
+name: CI Validation
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-branch-name:
+    name: Check Branch Prefix
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Verify feature/ prefix
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          echo "Checking branch name: $BRANCH_NAME"
+
+          if [[ "$BRANCH_NAME" =~ ^feature/ ]]; then
+            echo "✅ Branch name is valid."
+          else
+            echo "❌ Development is only allowed in branches starting with feature/."
+            exit 1
+          fi
+
+  verify-code:
+    name: Lint, Test and Build
+    needs: validate-branch-name
+    if: always() && (needs.validate-branch-name.result == 'success' || github.event_name == 'push')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build application
+        run: npm run build
