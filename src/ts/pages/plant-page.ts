@@ -58,6 +58,7 @@ class PlantPage extends Page {
       }
     });
     const popupContainer = document.createElement('img');
+    popupContainer.alt = `${this.getPlant().title} enlarged photo`;
     popupContainer.classList.add('product-page__popup-img');
     popup.append(popupContainer);
     document.body.append(popup);
@@ -82,6 +83,7 @@ class PlantPage extends Page {
       plant.images.forEach((pic, index) => {
         const img = document.createElement('img');
         img.src = `assets/img/${pic}`;
+        img.alt = `${plant.title} photo ${index + 1}`;
         img.classList.add('product-page__photo-mini');
         img.addEventListener('click', function (e) {
           const target = e.target;
