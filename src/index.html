@@ -7,8 +7,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="icon" href="./assets/svg/empty-cart-icon.svg">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@200;400;500&display=swap"
-    rel="stylesheet">
+  <link rel="preload" as="style"
+    href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@200;400;500&display=optional">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@200;400;500&display=optional"
+    rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@200;400;500&display=optional"
+      rel="stylesheet">
+  </noscript>
   <title>Online-store</title>
 </head>
 <body class="body">
@@ -39,7 +45,7 @@
     </main>
     <section id="promo" class="promo">
       <div class="container">
-        <img class="promo__photo" src="assets/img/eucalypt.png" alt="eucalypt">
+        <img class="promo__photo" src="assets/img/eucalypt.webp" alt="eucalypt" loading="lazy" decoding="async">
         <div class="promo__container">
           <h3 class="promo__title">Get <span>10% OFF</span> on your purchase</h3>
           <div class="promo__descr">Use promo codes:</div>
@@ -266,6 +272,7 @@
       <template id="productCardTemp">
         <div id="product" class="product">
           <div class="product__photo">
+            <img class="product__img" alt="">
             <div class="product__icons">
               <div class="product__discount"><div class="product__discount-num">20</div><span>%</span></div>
               <div class="product__rating"><div class="product__rating-num">4.5</div><span>&#9734;</span></div>

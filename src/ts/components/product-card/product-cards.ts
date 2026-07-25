@@ -13,14 +13,20 @@ class ProductCards {
     const fragment: DocumentFragment = document.createDocumentFragment();
     const productCardTemp: HTMLTemplateElement = getExistentElement<HTMLTemplateElement>('#productCardTemp');
 
-    productCard.forEach((item) => {
+    productCard.forEach((item, index) => {
       const productCardClone: Node = productCardTemp.content.cloneNode(true);
       if (!isHTMLElement(productCardClone)) throw new Error(`Element is not HTMLElement!`);
 
-      getExistentElement(
-        '.product__photo',
-        productCardClone
-      ).style.backgroundImage = `url('assets/img/${item.thumbnail}')`;
+      const img = getExistentElement<HTMLImageElement>('.product__img', productCardClone);
+      img.src = `assets/img/${item.thumbnail}`;
+      img.alt = item.title;
+      if (index < 6) {
+        img.loading = 'eager';
+        if (index === 0) img.setAttribute('fetchpriority', 'high');
+      } else {
+        img.loading = 'lazy';
+      }
+      img.decoding = 'async';
 
       getExistentElement('.product__type', productCardClone).textContent = item.type;
       getExistentElement('.product__title', productCardClone).textContent = item.title;
