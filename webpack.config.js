@@ -34,6 +34,9 @@ module.exports = (env, argv) => {
       new HtmlWebpackPlugin({
         template: 'src/index.html',
       }),
+
+      // Duplicate of index.html: GitHub Pages serves this for any unmatched path
+      // under /ci-cd/, letting the client-side router handle deep links/refreshes.
       ...(devMode
         ? []
         : [

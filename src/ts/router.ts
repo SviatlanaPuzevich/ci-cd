@@ -6,6 +6,16 @@ import CatalogPage from './pages/catalog-page';
 import ErrorPage from './pages/error-page';
 import PlantPage from './pages/plant-page';
 
+// Base path the app is deployed under (e.g. '/ci-cd' on GitHub Pages, '' locally).
+const BASE_PATH = process.env.PUBLIC_URL || '';
+
+function toLogicalPath(pathname: string): string {
+  if (BASE_PATH && pathname.startsWith(BASE_PATH)) {
+    return pathname.slice(BASE_PATH.length) || '/';
+  }
+  return pathname;
+}
+
 class Router {
   static catalogPage: CatalogPage;
   static cartPage: CartPage;
@@ -43,7 +53,7 @@ class Router {
   }
 
   static goTo(pageId: string) {
-    window.history.pushState({ pageId }, pageId, pageId);
+    window.history.pushState({ pageId }, pageId, BASE_PATH + pageId);
     Router.render(pageId);
     window.scrollTo(0, 0);
   }
@@ -56,7 +66,8 @@ class Router {
           e.preventDefault();
           if (
             link instanceof HTMLAnchorElement &&
-            (new URL(link.href).pathname !== '/catalog' || new URL(window.location.href).pathname !== '/catalog')
+            (new URL(link.href).pathname !== '/catalog' ||
+              toLogicalPath(new URL(window.location.href).pathname) !== '/catalog')
           ) {
             Router.goTo(new URL(link.href).pathname);
           }
@@ -68,9 +79,9 @@ class Router {
 
   static startRouter() {
     window.addEventListener('popstate', () => {
-      Router.render(new URL(window.location.href).pathname);
+      Router.render(toLogicalPath(new URL(window.location.href).pathname));
     });
-    const page = new URL(window.location.href).pathname;
+    const page = toLogicalPath(new URL(window.location.href).pathname);
     Router.render(page);
   }
 }
