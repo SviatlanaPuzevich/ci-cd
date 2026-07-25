@@ -74,8 +74,7 @@ class PlantPage extends Page {
       container.addEventListener('click', function (e) {
         const target = e.target;
         if (target instanceof HTMLElement && target.classList.contains('product-page__photo-block')) {
-          const url = target.style.backgroundImage.slice(5, -2);
-          popupObj.popupContainer.src = url;
+          popupObj.popupContainer.src = target.style.backgroundImage.slice(5, -2);
           popupObj.popup.classList.add('product-page__popup_active');
           document.body.classList.add('body_hold');
         }

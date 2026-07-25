@@ -4,7 +4,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const EslintPlugin = require('eslint-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = (env, argv) => {
   const mode = argv.mode || 'development';
@@ -46,17 +45,15 @@ module.exports = (env, argv) => {
               filename: '404.html',
             }),
           ]),
-
       new MiniCssExtractPlugin({
         filename: '[name].[contenthash].css',
       }),
-
-      new EslintPlugin({ extensions: ['ts', 'js'] }),
-
+      new EslintPlugin({
+        extensions: ['ts', 'js'],
+      }),
       new webpack.DefinePlugin({
         'process.env.PUBLIC_URL': JSON.stringify(basePath),
       }),
-
       new CopyPlugin({
         patterns: [
           { from: 'src/assets', to: 'assets' },
@@ -64,8 +61,6 @@ module.exports = (env, argv) => {
           { from: path.resolve(__dirname, '_redirects'), to: '' },
         ],
       }),
-
-      new CleanWebpackPlugin(),
     ],
     module: {
       rules: [
@@ -81,7 +76,7 @@ module.exports = (env, argv) => {
         {
           test: /\.scss$/,
           use: [
-            'style-loader',
+            devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
             'css-loader',
             {
               loader: 'sass-loader',
@@ -104,22 +99,11 @@ module.exports = (env, argv) => {
             {
               loader: 'image-webpack-loader',
               options: {
-                mozjpeg: {
-                  progressive: true,
-                },
-                optipng: {
-                  enabled: false,
-                },
-                pngquant: {
-                  quality: [0.65, 0.9],
-                  speed: 4,
-                },
-                gifsicle: {
-                  interlaced: false,
-                },
-                webp: {
-                  quality: 75,
-                },
+                mozjpeg: { progressive: true },
+                optipng: { enabled: false },
+                pngquant: { quality: [0.65, 0.9], speed: 4 },
+                gifsicle: { interlaced: false },
+                webp: { quality: 75 },
               },
             },
           ],
